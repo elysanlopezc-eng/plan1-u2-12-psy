@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Montano School - Interactive Digital Whiteboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Tailwind Configuration for Montano Palette -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        montano: {
+                            blue: '#1269A8',
+                            yellow: '#F7D615',
+                            sage: '#54887D',
+                            lightblue: '#88B5C7',
+                            olive: '#A6B046',
+                            bg: '#F2F5E9'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .pizarra-board {
+            background-color: #F2F5E9;
+            background-image: radial-gradient(#1269A8 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+        .tab-btn.active {
+            background-color: #1269A8;
+            color: #ffffff;
+            border-bottom: 4px solid #F7D615;
+            transform: translateY(-2px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #E2E8F0;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #54887D;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 min-h-screen flex flex-col antialiased selection:bg-montano-yellow selection:text-montano-blue">
+
+    <!-- TOP BAR / HEADER -->
+    <header class="bg-montano-blue text-white shadow-md border-b-4 border-montano-yellow sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <!-- Institutional Logo & Header Info -->
+            <div class="flex items-center space-x-4">
+                <div class="bg-white p-1.5 rounded-lg shadow-inner">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyEop0yf6lZ7Jk9MILZxF1rBj4Oqs5esyhIQ&s" 
+                         alt="Colegio Montano Logo" 
+                         class="h-10 w-auto object-contain"
+                         onerror="this.src='https://placehold.co/120x40/1269A8/FFFFFF?text=Montano+School'">
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide text-montano-yellow">COLEGIO MONTANO</h1>
+                    <p class="text-xs text-montano-lightblue font-medium">Digital Interactive Whiteboard • Lesson Plan</p>
+                </div>
+            </div>
+
+            <!-- Class Quick Details -->
+            <div class="hidden md:flex items-center space-x-6 text-xs bg-black/20 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/10">
+                <div>
+                    <span class="text-montano-yellow font-semibold">Course:</span> Psychology
+                </div>
+                <div>
+                    <span class="text-montano-yellow font-semibold">Grade:</span> 5th Marketing
+                </div>
+                <div>
+                    <span class="text-montano-yellow font-semibold">Unit/Plan:</span> U2 - Plan #1
+                </div>
+                <div>
+                    <span class="text-montano-yellow font-semibold">Teacher:</span> Ms. Elysa López
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center space-x-2">
+                <button id="fullscreenBtn" onclick="toggleFullscreen()" class="bg-montano-sage hover:bg-opacity-90 text-white font-medium px-3.5 py-2 rounded-lg text-sm transition-all flex items-center shadow border border-white/20">
+                    <i class="fa-solid fa-expand mr-2"></i> <span id="fullscreenText">Full Screen</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
+
+        <!-- INSTITUTIONAL FRAMEWORK CARD (CNB & MONTANO HABITS) -->
+        <section class="bg-white rounded-2xl shadow-md border-l-8 border-montano-blue p-5 transition-all">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-100 pb-3 mb-4 gap-2">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-graduation-cap text-montano-blue text-xl"></i>
+                    <h2 class="font-bold text-lg text-montano-blue uppercase tracking-wide">Pedagogical Alignment & Goals</h2>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-montano-lightblue/20 text-montano-blue text-xs font-semibold px-3 py-1 rounded-full border border-montano-lightblue/40">
+                        <i class="fa-solid fa-calendar-day mr-1"></i> March 29th - April 2nd
+                    </span>
+                    <span class="bg-montano-yellow/30 text-yellow-900 text-xs font-semibold px-3 py-1 rounded-full border border-montano-yellow">
+                        <i class="fa-solid fa-language mr-1"></i> ESL Level B2 Advanced
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <!-- CNB & Learning Achievement -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-bold text-montano-sage mb-2 flex items-center">
+                        <i class="fa-solid fa-bullseye mr-2"></i> CNB Competence & Achievement
+                    </h3>
+                    <p class="text-gray-700 text-xs mb-2">
+                        <strong>Competence:</strong> Applies scientific methods of psychological inquiry to analyze market trends and consumer behavior objectively.
+                    </p>
+                    <p class="text-gray-700 text-xs">
+                        <strong>Learning Outcome:</strong> Formulates a clear, measurable, and researchable research question from a realistic consumer behavior problem.
+                    </p>
+                </div>
+
+                <!-- Key Competencies -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-bold text-montano-sage mb-2 flex items-center">
+                        <i class="fa-solid fa-brain mr-2"></i> Key Skills & Competencies
+                    </h3>
+                    <ul class="text-xs text-gray-700 space-y-1 list-disc list-inside">
+                        <li>Critical Thinking & Fact Analysis</li>
+                        <li>Problem Definition & Synthesis</li>
+                        <li>Targeted Communication</li>
+                        <li>Decision Making in Marketing</li>
+                    </ul>
+                </div>
+
+                <!-- Montano Habits -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-bold text-montano-sage mb-2 flex items-center">
+                        <i class="fa-solid fa-star mr-2"></i> Montano Formative Habits
+                    </h3>
+                    <div class="flex flex-wrap gap-1.5 mt-1">
+                        <span class="bg-montano-blue text-white text-[11px] px-2 py-1 rounded-md font-medium">1. Be Proactive</span>
+                        <span class="bg-montano-sage text-white text-[11px] px-2 py-1 rounded-md font-medium">2. Begin with the End in Mind</span>
+                        <span class="bg-montano-olive text-white text-[11px] px-2 py-1 rounded-md font-medium">5. Seek First to Understand...</span>
+                        <span class="bg-montano-lightblue text-white text-[11px] px-2 py-1 rounded-md font-medium">6. Synergize</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIGITAL INTERACTIVE WHITEBOARD SECTION -->
+        <section class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-montano-blue/20 flex flex-col flex-grow">
+            
+            <!-- BOARD NAVIGATION TABS -->
+            <div class="bg-gray-100 p-2 border-b border-gray-200 flex flex-wrap gap-2 justify-between items-center">
+                <div class="flex flex-wrap gap-2 w-full md:w-auto" id="tabContainer">
+                    <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active flex-1 md:flex-none font-semibold px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 bg-white text-gray-700 shadow-sm">
+                        <span class="bg-montano-yellow text-gray-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">I</span>
+                        <span>Warm-up & Hook (5m)</span>
+                    </button>
+                    <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn flex-1 md:flex-none font-semibold px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 bg-white text-gray-700 shadow-sm">
+                        <span class="bg-montano-yellow text-gray-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">II</span>
+                        <span>Individual Task (20m)</span>
+                    </button>
+                    <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn flex-1 md:flex-none font-semibold px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 bg-white text-gray-700 shadow-sm">
+                        <span class="bg-montano-yellow text-gray-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">III</span>
+                        <span>Cooperative Team Work (30m)</span>
+                    </button>
+                    <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn flex-1 md:flex-none font-semibold px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 bg-white text-gray-700 shadow-sm">
+                        <span class="bg-montano-yellow text-gray-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">IV</span>
+                        <span>Plenary & Interactive Trivia (15m)</span>
+                    </button>
+                </div>
+
+                <div class="hidden lg:flex items-center text-xs font-semibold text-montano-sage px-3 py-1 bg-montano-sage/10 rounded-lg">
+                    <i class="fa-solid fa-clock mr-1.5"></i> Total Session Time: 70 Minutes
+                </div>
+            </div>
+
+            <!-- PIZRA AREA / TAB CONTENT CANVAS -->
+            <div class="pizarra-board p-6 flex-grow min-h-[480px] relative custom-scrollbar overflow-y-auto">
+
+                <!-- ================= TAB I: WARM-UP & HOOK ================= -->
+                <div id="tab1" class="tab-content block space-y-6">
+                    <div class="bg-white/95 backdrop-blur-sm p-6 rounded-2xl border-2 border-montano-blue/30 shadow-lg">
+                        <div class="flex items-center justify-between border-b pb-3 mb-4">
+                            <span class="text-xs font-bold bg-montano-blue text-white px-3 py-1 rounded-full uppercase tracking-wider">Tab I • Opening Motivation</span>
+                            <span class="text-sm font-semibold text-montano-sage"><i class="fa-solid fa-hourglass-start mr-1"></i> Estimated Time: 5 Minutes</span>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-montano-blue mb-3">Opening Marketing Question: Customer Preference</h3>
+                        <p class="text-gray-700 text-base mb-6 leading-relaxed">
+                            "Imagine our client launched two different energy drinks, but Product A is outperforming Product B by 400%. <strong>How could we scientifically find out why customers prefer one product over the other?</strong>"
+                        </p>
+
+                        <!-- Brainstorming Interactive Prompt Box -->
+                        <div class="bg-montano-bg p-5 rounded-xl border border-montano-olive/30 mb-6">
+                            <h4 class="font-bold text-montano-sage mb-2 flex items-center">
+                                <i class="fa-solid fa-comments mr-2 text-montano-yellow"></i> Quick Brainstorming Challenge (Montano Habit: Seek First to Understand)
+                            </h4>
+                            <p class="text-sm text-gray-600 mb-4">Click to reveal student response prompts to guide classroom participation:</p>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <button onclick="toggleHint('hint1')" class="bg-white hover:bg-montano-yellow/20 text-gray-800 text-xs font-semibold p-3 rounded-lg border border-gray-200 text-left transition flex justify-between items-center shadow-sm">
+                                    <span>Option A: Intuition & Guessing?</span>
+                                    <i class="fa-solid fa-chevron-down text-montano-blue"></i>
+                                </button>
+                                <button onclick="toggleHint('hint2')" class="bg-white hover:bg-montano-yellow/20 text-gray-800 text-xs font-semibold p-3 rounded-lg border border-gray-200 text-left transition flex justify-between items-center shadow-sm">
+                                    <span>Option B: Direct Observation?</span>
+                                    <i class="fa-solid fa-chevron-down text-montano-blue"></i>
+                                </button>
+                                <button onclick="toggleHint('hint3')" class="bg-white hover:bg-montano-yellow/20 text-gray-800 text-xs font-semibold p-3 rounded-lg border border-gray-200 text-left transition flex justify-between items-center shadow-sm">
+                                    <span>Option C: Scientific Experiment?</span>
+                                    <i class="fa-solid fa-chevron-down text-montano-blue"></i>
+                                </button>
+                            </div>
+
+                            <!-- Dropdown Explanations -->
+                            <div id="hint1" class="hidden mt-3 p-3 bg-red-50 text-red-800 text-xs rounded-lg border border-red-200">
+                                <strong>Intuition/Gut Feeling:</strong> Unreliable in business and psychology. Assumptions lead to costly marketing mistakes!
+                            </div>
+                            <div id="hint2" class="hidden mt-3 p-3 bg-yellow-50 text-yellow-800 text-xs rounded-lg border border-yellow-200">
+                                <strong>Observational Research:</strong> Watching customers buy in real time. Great start, but does it tell us <i>why</i> they feel that way?
+                            </div>
+                            <div id="hint3" class="hidden mt-3 p-3 bg-green-50 text-green-800 text-xs rounded-lg border border-green-200">
+                                <strong>Controlled Psychological Experiment:</strong> Isolating variables (taste, branding, pricing, packaging) to establish cause and effect.
+                            </div>
+                        </div>
+
+                        <!-- Key Takeaway Banner -->
+                        <div class="bg-montano-blue/10 p-4 rounded-xl border-l-4 border-montano-blue text-sm text-montano-blue font-semibold">
+                            <i class="fa-solid fa-lightbulb text-montano-yellow mr-2 text-lg"></i>
+                            Key Hook: Psychology provides the rigorous scientific methodology marketing needs to move from guessing to knowing.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB II: INDIVIDUAL WORK ================= -->
+                <div id="tab2" class="tab-content hidden space-y-6">
+                    <div class="bg-white/95 backdrop-blur-sm p-6 rounded-2xl border-2 border-montano-blue/30 shadow-lg">
+                        <div class="flex items-center justify-between border-b pb-3 mb-4">
+                            <span class="text-xs font-bold bg-montano-blue text-white px-3 py-1 rounded-full uppercase tracking-wider">Tab II • Individual Task & Guided Concept</span>
+                            <span class="text-sm font-semibold text-montano-sage"><i class="fa-solid fa-clock mr-1"></i> Time: 20 Minutes (10m Direct Instruction + 10m Individual Practice)</span>
+                        </div>
+
+                        <!-- Theoretical Distinction Matrix -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-montano-blue mb-2">Part 1: Distinguishing Evidence vs. Opinion vs. Assumption</h3>
+                            <p class="text-xs text-gray-600 mb-4">Students review the definitions and classify real marketing statements in their notebooks.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-700">Scientific Evidence</span>
+                                    <p class="text-xs text-gray-700 mt-1">Empirical data gathered through systematic observation or controlled testing.</p>
+                                </div>
+                                <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-xl">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-yellow-800">Opinion</span>
+                                    <p class="text-xs text-gray-700 mt-1">Personal belief, preference, or judgment not backed by empirical proof.</p>
+                                </div>
+                                <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-purple-700">Assumption</span>
+                                    <p class="text-xs text-gray-700 mt-1">A premise taken for granted without verifying facts or testing hypotheses.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Practical Exercise with Solution Toggle -->
+                        <div class="bg-montano-bg p-5 rounded-xl border border-montano-sage/30">
+                            <h4 class="font-bold text-montano-blue mb-2 flex items-center text-sm">
+                                <i class="fa-solid fa-pen-to-square mr-2 text-montano-sage"></i> Individual Practice Task (Student Notebooks)
+                            </h4>
+                            <p class="text-xs text-gray-700 mb-3">
+                                Classify each statement below as <strong>[E] Evidence</strong>, <strong>[O] Opinion</strong>, or <strong>[A] Assumption</strong>:
+                            </p>
+                            
+                            <div class="space-y-2 text-xs">
+                                <div class="p-2.5 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
+                                    <span>1. "Teenagers buy brand X solely because the packaging is bright green."</span>
+                                    <span class="font-bold text-gray-400">[ ? ]</span>
+                                </div>
+                                <div class="p-2.5 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
+                                    <span>2. "Eye-tracking software showed 78% of test subjects looked at the top-right logo first."</span>
+                                    <span class="font-bold text-gray-400">[ ? ]</span>
+                                </div>
+                                <div class="p-2.5 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
+                                    <span>3. "I think minimalist website design always looks much better."</span>
+                                    <span class="font-bold text-gray-400">[ ? ]</span>
+                                </div>
+                            </div>
+
+                            <!-- Solution Accordion Button (Mandatory Feature) -->
+                            <div class="mt-4">
+                                <button onclick="toggleAccordion('individualSolution')" class="w-full bg-montano-sage hover:bg-montano-sage/90 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition flex justify-between items-center shadow">
+                                    <span><i class="fa-solid fa-key mr-2"></i> Click to Reveal Answer Key & Self-Check</span>
+                                    <i class="fa-solid fa-chevron-down" id="arrow-individualSolution"></i>
+                                </button>
+                                
+                                <div id="individualSolution" class="hidden mt-3 p-4 bg-white rounded-xl border border-montano-sage text-xs text-gray-700 space-y-2">
+                                    <p><strong class="text-montano-blue">Statement 1: [A] Assumption.</strong> It assumes cause without controlled data isolating packaging color from price or taste.</p>
+                                    <p><strong class="text-montano-blue">Statement 2: [E] Evidence.</strong> Quantifiable empirical result measured directly via eye-tracking technology.</p>
+                                    <p><strong class="text-montano-blue">Statement 3: [O] Opinion.</strong> Reflects subjective aesthetic taste rather than scientific fact.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB III: COOPERATIVE WORK ================= -->
+                <div id="tab3" class="tab-content hidden space-y-6">
+                    <div class="bg-white/95 backdrop-blur-sm p-6 rounded-2xl border-2 border-montano-blue/30 shadow-lg">
+                        <div class="flex items-center justify-between border-b pb-3 mb-4">
+                            <span class="text-xs font-bold bg-montano-blue text-white px-3 py-1 rounded-full uppercase tracking-wider">Tab III • Cooperative Team Challenge</span>
+                            <span class="text-sm font-semibold text-montano-sage"><i class="fa-solid fa-clock mr-1"></i> Time: 30 Minutes</span>
+                        </div>
+
+                        <!-- Marketing Scenario Briefing -->
+                        <div class="bg-montano-lightblue/15 p-4 rounded-xl border-l-4 border-montano-lightblue mb-5">
+                            <h3 class="font-bold text-montano-blue text-sm mb-1 flex items-center">
+                                <i class="fa-solid fa-store mr-2"></i> Marketing Problem Briefing (Team Challenge)
+                            </h3>
+                            <p class="text-xs text-gray-700 leading-relaxed">
+                                <strong>Scenario:</strong> "A local artisanal snack company observed a 35% decrease in online repeat purchases among young adults (ages 18-24) over the last quarter, despite high initial engagement on social media ads."
+                            </p>
+                        </div>
+
+                        <!-- Team Roles & Instructions -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
+                            <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm text-center">
+                                <span class="bg-montano-blue text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Role 1</span>
+                                <h4 class="font-bold text-xs text-montano-blue mt-1">Lead Researcher</h4>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Ensures adherence to scientific steps.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm text-center">
+                                <span class="bg-montano-sage text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Role 2</span>
+                                <h4 class="font-bold text-xs text-montano-sage mt-1">Data Analyst</h4>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Separates facts from assumptions.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm text-center">
+                                <span class="bg-montano-olive text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Role 3</span>
+                                <h4 class="font-bold text-xs text-montano-olive mt-1">Question Designer</h4>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Narrows broad topic into focused question.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm text-center">
+                                <span class="bg-montano-yellow text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-full">Role 4</span>
+                                <h4 class="font-bold text-xs text-yellow-900 mt-1">Spokesperson</h4>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Prepares presentation for Plenary.</p>
+                            </div>
+                        </div>
+
+                        <!-- Task Execution Matrix -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-300">
+                            <h4 class="font-bold text-xs text-montano-blue uppercase tracking-wide mb-3">Team Deliverable: Scientific Refinement Matrix</h4>
+                            <div class="space-y-3 text-xs">
+                                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <strong class="text-montano-blue block mb-1">Step 1: Define Broad Topic</strong>
+                                    <span class="text-gray-600">Example: "Why customers leave." (Too broad!)</span>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <strong class="text-montano-sage block mb-1">Step 2: Identify Specific Psychological Variables</strong>
+                                    <span class="text-gray-600">Consider variables: Customer satisfaction, brand loyalty, unboxing experience, price perception, cognitive dissonance.</span>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <strong class="text-montano-olive block mb-1">Step 3: Formulate Focused Research Question</strong>
+                                    <span class="text-gray-600 font-mono bg-white px-2 py-1 rounded border border-gray-200 inline-block">"How does package delivery time affect post-purchase customer satisfaction in buyers aged 18-24?"</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB IV: PLENARY & TRIVIA ================= -->
+                <div id="tab4" class="tab-content hidden space-y-6">
+                    <div class="bg-white/95 backdrop-blur-sm p-6 rounded-2xl border-2 border-montano-blue/30 shadow-lg">
+                        <div class="flex items-center justify-between border-b pb-3 mb-4">
+                            <span class="text-xs font-bold bg-montano-blue text-white px-3 py-1 rounded-full uppercase tracking-wider">Tab IV • Plenary & Interactive Review Game</span>
+                            <span class="text-sm font-semibold text-montano-sage"><i class="fa-solid fa-clock mr-1"></i> Time: 15 Minutes</span>
+                        </div>
+
+                        <!-- Interactive Review Game (Trivia) -->
+                        <div class="bg-montano-bg p-5 rounded-2xl border-2 border-montano-yellow mb-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-montano-blue text-base flex items-center">
+                                    <i class="fa-solid fa-gamepad text-montano-yellow text-xl mr-2"></i> Scientific Method Rapid Trivia Game
+                                </h3>
+                                <span class="text-xs bg-montano-yellow font-bold text-gray-900 px-3 py-1 rounded-full">Interactive Review</span>
+                            </div>
+
+                            <!-- Trivia Display Box -->
+                            <div id="triviaBox" class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mb-4">
+                                <p id="triviaQuestion" class="font-semibold text-gray-800 text-sm mb-4">
+                                    Question 1: What is the crucial difference between an assumption and scientific evidence?
+                                </p>
+                                <div id="triviaOptions" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                    <button onclick="checkAnswer(this, false)" class="p-3 rounded-lg border border-gray-200 text-left hover:bg-gray-50 transition">A) Assumptions are proven by data; evidence is just a guess.</button>
+                                    <button onclick="checkAnswer(this, true)" class="p-3 rounded-lg border border-gray-200 text-left hover:bg-gray-50 transition">B) Evidence is empirically gathered and tested; assumptions are unverified beliefs.</button>
+                                    <button onclick="checkAnswer(this, false)" class="p-3 rounded-lg border border-gray-200 text-left hover:bg-gray-50 transition">C) Opinions and assumptions are identical in psychological research.</button>
+                                    <button onclick="checkAnswer(this, false)" class="p-3 rounded-lg border border-gray-200 text-left hover:bg-gray-50 transition">D) Assumptions require eye-tracking software to be validated.</button>
+                                </div>
+                                <div id="triviaFeedback" class="hidden mt-3 p-3 rounded-lg text-xs font-bold"></div>
+                            </div>
+                        </div>
+
+                        <!-- Exit Task Banner -->
+                        <div class="bg-montano-olive/15 p-4 rounded-xl border-l-4 border-montano-olive mb-6">
+                            <h4 class="font-bold text-montano-olive text-sm mb-1 flex items-center">
+                                <i class="fa-solid fa-door-open mr-2"></i> Exit Task (Individual Assessment)
+                            </h4>
+                            <p class="text-xs text-gray-700">
+                                Before leaving, every student must submit <strong>one focused, researchable psychological question</strong> based on a real-world marketing scenario on an exit ticket.
+                            </p>
+                        </div>
+
+                        <!-- Interactive Assessment Rubric / CheckList -->
+                        <div class="border-t pt-4">
+                            <h3 class="font-bold text-montano-blue text-sm mb-3 flex items-center">
+                                <i class="fa-solid fa-clipboard-check text-montano-sage mr-2"></i> Interactive Plenary Evaluation Checklist
+                            </h3>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs border-collapse bg-white rounded-xl overflow-hidden shadow-sm">
+                                    <thead class="bg-montano-blue text-white uppercase text-[11px]">
+                                        <tr>
+                                            <th class="p-3">Evaluation Criteria</th>
+                                            <th class="p-3 text-center">Excellent (3 pts)</th>
+                                            <th class="p-3 text-center">Satisfactory (2 pts)</th>
+                                            <th class="p-3 text-center">Needs Improvement (1 pt)</th>
+                                            <th class="p-3 text-center">Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 text-gray-700">
+                                        <tr>
+                                            <td class="p-3 font-semibold">1. Domain Mastery & Scientific Rigor</td>
+                                            <td class="p-3 text-center text-gray-500">Clearly distinguishes facts from assumptions</td>
+                                            <td class="p-3 text-center text-gray-500">Minor confusion in terms</td>
+                                            <td class="p-3 text-center text-gray-500">Relies heavily on opinion</td>
+                                            <td class="p-3 text-center">
+                                                <input type="number" min="1" max="3" value="3" onchange="calculateScore()" class="rubric-score w-12 text-center border rounded p-1 font-bold text-montano-blue">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 font-semibold">2. Research Question Quality</td>
+                                            <td class="p-3 text-center text-gray-500">Focused, specific, & measurable</td>
+                                            <td class="p-3 text-center text-gray-500">Slightly broad or vague</td>
+                                            <td class="p-3 text-center text-gray-500">Unfocused/not testable</td>
+                                            <td class="p-3 text-center">
+                                                <input type="number" min="1" max="3" value="3" onchange="calculateScore()" class="rubric-score w-12 text-center border rounded p-1 font-bold text-montano-blue">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 font-semibold">3. Collaborative Work & Equity</td>
+                                            <td class="p-3 text-center text-gray-500">All team members participated</td>
+                                            <td class="p-3 text-center text-gray-500">Dominated by 1-2 members</td>
+                                            <td class="p-3 text-center text-gray-500">Unequal participation</td>
+                                            <td class="p-3 text-center">
+                                                <input type="number" min="1" max="3" value="3" onchange="calculateScore()" class="rubric-score w-12 text-center border rounded p-1 font-bold text-montano-blue">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 font-semibold">4. Q&A Plenary Response</td>
+                                            <td class="p-3 text-center text-gray-500">Confident & precise answers</td>
+                                            <td class="p-3 text-center text-gray-500">Hesitant but correct</td>
+                                            <td class="p-3 text-center text-gray-500">Unable to justify answers</td>
+                                            <td class="p-3 text-center">
+                                                <input type="number" min="1" max="3" value="3" onchange="calculateScore()" class="rubric-score w-12 text-center border rounded p-1 font-bold text-montano-blue">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-200">
+                                <span class="font-bold text-xs text-gray-700">Total Plenary Assessment Score:</span>
+                                <span id="totalScore" class="text-base font-extrabold text-montano-blue">12 / 12 pts (100%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-800 text-gray-300 py-3 text-center text-xs border-t border-gray-700">
+        <p>© Colegio Montano • Formative Model & CNB Guatemala Alignment • Created for Ms. Elysa López</p>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT CONTROLS -->
+    <script>
+        // Tab Switch Logic
+        function switchTab(tabId) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.add('hidden'));
+
+            // Remove active class from buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show current tab & activate button
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+
+        // Dropdown / Accordion Toggles
+        function toggleHint(id) {
+            const hint = document.getElementById(id);
+            hint.classList.toggle('hidden');
+        }
+
+        function toggleAccordion(id) {
+            const accordion = document.getElementById(id);
+            const arrow = document.getElementById('arrow-' + id);
+            
+            accordion.classList.toggle('hidden');
+            if (arrow) {
+                arrow.classList.toggle('rotate-180');
+            }
+        }
+
+        // Fullscreen Mode Toggle
+        function toggleFullscreen() {
+            const btnText = document.getElementById('fullscreenText');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+                btnText.textContent = "Exit Fullscreen";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    btnText.textContent = "Full Screen";
+                }
+            }
+        }
+
+        // Trivia Game Functionality
+        function checkAnswer(button, isCorrect) {
+            const feedback = document.getElementById('triviaFeedback');
+            const options = document.getElementById('triviaOptions').querySelectorAll('button');
+            
+            // Disable all buttons after choice
+            options.forEach(btn => btn.disabled = true);
+
+            feedback.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+            
+            if (isCorrect) {
+                button.classList.add('bg-green-200', 'border-green-500');
+                feedback.classList.add('bg-green-100', 'text-green-800');
+                feedback.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> Correct! Scientific evidence requires systematic observation and empirical testing, whereas assumptions lack proof.';
+            } else {
+                button.classList.add('bg-red-200', 'border-red-500');
+                feedback.classList.add('bg-red-100', 'text-red-800');
+                feedback.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i> Incorrect. Scientific evidence relies on empirical data, not unverified assumptions or opinions.';
+            }
+        }
+
+        // Rubric Calculator
+        function calculateScore() {
+            const scoreInputs = document.querySelectorAll('.rubric-score');
+            let total = 0;
+            scoreInputs.forEach(input => {
+                let val = parseInt(input.value) || 0;
+                if (val > 3) val = 3;
+                if (val < 1) val = 1;
+                input.value = val;
+                total += val;
+            });
+            const percentage = Math.round((total / 12) * 100);
+            document.getElementById('totalScore').textContent = `${total} / 12 pts (${percentage}%)`;
+        }
+    </script>
+</body>
+</html>
